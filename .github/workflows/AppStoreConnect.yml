@@ -27,6 +27,7 @@ jobs:
           bundle install
 
   UploadMetadata:
+    needs: Archive
     uses: NickeyTestOrganization/TestProject114/.github/workflows/UploadMetadata.yml@main
     with:
       upload_screenshots: false
