@@ -26,119 +26,33 @@ jobs:
         run: |
           bundle install
 
-      # - name: Slack begin workflow
-      #   run: |
-      #     bundle exec fastlane slack_message messageText:"自动化发布流程开始，开始上传Metadata\n*OOG101 - 7M Workout*\n<!subteam^S02KJ2JPCLE> <!subteam^S01K6B7A338> \n*推送程序员：* ${{ github.actor }}\n*打包时间：* $(TZ=$TZ-8 date +%Y年%m月%d日%H:%M:%S)\n"
-      - name: Upload metadata
-        uses: NickeyTestOrganization/TestProject114/.github/workflows/UploadMetadata.yml@main
-        with:
-          upload_screenshots: false
-        # run: |
-        #   bundle exec fastlane upload_metadata kId:'${{ secrets.KEY_ID }}' issueId:'${{ secrets.ISSUE_ID }}' p8PrivateKey:'${{ secrets.P8_PRIVATE_KEY }}'
+  UploadMetadata:
+    uses: NickeyTestOrganization/TestProject114/.github/workflows/UploadMetadata.yml@main
+    with:
+      upload_screenshots: false
 
-      # - name: Slack upload metadata finish message
-      #   run: |
-      #     bundle exec fastlane slack_message messageText:"发布包上传Metadata完成\n*OOG101 - 7M Workout*\n<!subteam^S02KJ2JPCLE> <!subteam^S01K6B7A338> 发布包上传metadata完成\n*推送程序员：* ${{ github.actor }}\n*打包时间：* $(TZ=$TZ-8 date +%Y年%m月%d日%H:%M:%S)\n"
+  # upload:
+  #   needs: Archive
+  #   runs-on: self-hosted
+  #   steps:
+  #     - name: Check ipa file
+  #       run: |
+  #         BACKUP_DIR=$(basename "$PWD")
+  #         BACKUP_DIR_PATH=${HOME}"/Documents/Backup/"
+  #         FASTLANE_RELEASE_DIR="./fastlane/Release/"
+  #         IPA_NAME="OOG114.ipa"
 
-      # - name: Copy backup file
-      #   run: |
-      #     BACKUP_DIR=$(basename "$PWD")
-      #     BACKUP_DIR_PATH=${HOME}"/Documents/Backup/"
-      #     if [ -f ${BACKUP_DIR_PATH}${BACKUP_DIR}/"Podfile.lock" ]; then
-      #         echo "Podfile.lock exist!"
-      #         cp -f ${BACKUP_DIR_PATH}${BACKUP_DIR}/Podfile.lock ./Podfile.lock
-      #     fi
+  #         if [ ! -f "${FASTLANE_RELEASE_DIR}/${IPA_NAME}" ]; then
+  #             echo "未找到ipa文件，从Backup文件夹中复制"
+  #             if [ ! -d "${FASTLANE_RELEASE_DIR}" ]; then
+  #                 echo "未找到Release文件夹，创建文件夹"
+  #                 mkdir "${FASTLANE_RELEASE_DIR}"
+  #             fi
+  #             cp -r "${BACKUP_DIR_PATH}${BACKUP_DIR}/${IPA_NAME}" "${FASTLANE_RELEASE_DIR}"
+  #             echo "复制完成"
+  #         fi
+  #         echo "开始上传ipa文件"
 
-      - name: Pod Install
-        run: |
-          # 重新拉取pod
-          pod install --repo-update
-
-      # - name: Slack archive begin message
-      #   run: |
-      #     bundle exec fastlane slack_message messageText:"发布包开始导出ipa文件\n*OOG101 - 7M Workout*\n<!subteam^S02KJ2JPCLE> <!subteam^S01K6B7A338> 发布包开始导出ipa文件\n*推送程序员：* ${{ github.actor }}\n*打包时间：* $(TZ=$TZ-8 date +%Y年%m月%d日%H:%M:%S)\n"
-
-      - name: Archive&Export
-        run: |
-          bundle exec fastlane ArchiveAndExport type:"app-store"
-
-      # - name: Slack export finish message
-      #   run: |
-      #     bundle exec fastlane slack_message messageText:"发布包ipa文件已导出\n*OOG101 - 7M Workout*\n<!subteam^S02KJ2JPCLE> <!subteam^S01K6B7A338> 发布包ipa文件已导出，开始上传dSYM文件\n*推送程序员：* ${{ github.actor }}\n*打包时间：* $(TZ=$TZ-8 date +%Y年%m月%d日%H:%M:%S)\n"
-
-      # - name: Upload dSYM to firebase
-      #   run: |
-      #     bundle exec fastlane upload_dSYM
-
-      # - name: Slack upload dSYM finish message
-      #   run: |
-      #     bundle exec fastlane slack_message messageText:"发布包dSYM文件上传完成\n*OOG101 - 7M Workout*\n<!subteam^S02KJ2JPCLE> <!subteam^S01K6B7A338> 发布包dSYM文件上传完成，开始上传二进制文件\n*推送程序员：* ${{ github.actor }}\n*打包时间：* $(TZ=$TZ-8 date +%Y年%m月%d日%H:%M:%S)\n"
-
-      - name: Backup ipa and dSYM
-        run: |
-          BACKUP_DIR=$(basename "$PWD")
-          BACKUP_DIR_PATH=${HOME}"/Documents/Backup/"
-          FASTLANE_RELEASE_DIR="./fastlane/Release/"
-
-          if [ ! -d "$BACKUP_DIR_PATH" ]; then
-              echo "未找到备份文件夹，创建备份文件夹"
-              mkdir ${BACKUP_DIR_PATH}
-          fi
-
-          if [ ! -d "${BACKUP_DIR_PATH}${BACKUP_DIR}" ]; then
-              echo "未找到备份子文件夹，创建备份子文件夹"
-              mkdir ${BACKUP_DIR_PATH}${BACKUP_DIR}
-          fi
-
-          cp ${FASTLANE_RELEASE_DIR}*.ipa ${BACKUP_DIR_PATH}${BACKUP_DIR}
-          cp ${FASTLANE_RELEASE_DIR}*.dSYM.zip ${BACKUP_DIR_PATH}${BACKUP_DIR}
-          echo "备份完成"
-
-  upload:
-    needs: Archive
-    runs-on: self-hosted
-    steps:
-      - name: Check ipa file
-        run: |
-          BACKUP_DIR=$(basename "$PWD")
-          BACKUP_DIR_PATH=${HOME}"/Documents/Backup/"
-          FASTLANE_RELEASE_DIR="./fastlane/Release/"
-          IPA_NAME="OOG114.ipa"
-
-          if [ ! -f "${FASTLANE_RELEASE_DIR}/${IPA_NAME}" ]; then
-              echo "未找到ipa文件，从Backup文件夹中复制"
-              if [ ! -d "${FASTLANE_RELEASE_DIR}" ]; then
-                  echo "未找到Release文件夹，创建文件夹"
-                  mkdir "${FASTLANE_RELEASE_DIR}"
-              fi
-              cp -r "${BACKUP_DIR_PATH}${BACKUP_DIR}/${IPA_NAME}" "${FASTLANE_RELEASE_DIR}"
-              echo "复制完成"
-          fi
-          echo "开始上传ipa文件"
-
-      - name: Upload binary
-        run: |
-          bundle exec fastlane upload_binary
-
-      # - name: Slack upload binary finish message
-      #   run: |
-      #     bundle exec fastlane slack_message messageText:"发布包上传成功\n*OOG101 - 7M Workout*\n<!subteam^S02KJ2JPCLE> <!subteam^S01K6B7A338> 发布包上传成功，等待审核\n*推送程序员：* ${{ github.actor }}\n*打包时间：* $(TZ=$TZ-8 date +%Y年%m月%d日%H:%M:%S)\n"
-
-      # - name: Slack submit message
-      #   run: |
-      #     bundle exec fastlane send_submit_message
-
-      # - name: Push Podfile.lock to Github
-      #   run: |
-      #     # 检查仓库状态并写入Status.txt
-      #     git status -s >>Status.txt
-      #     # 判断Podfile.lock有无修改
-      #     if [ $(grep -c "Podfile.lock" Status.txt) != 0 ]; then
-      #       echo "检测到Podfile.lock有变动，执行上传操作"
-      #       # 提交Podfile.lock文件
-      #       bundle exec fastlane push_Podfile_lock
-      #     else
-      #       echo "未检测到Podfile.lock有变动，结束"
-      #     fi
-      #     # 将Status.txt文件删除
-      #     rm -f Status.txt
+  #     - name: Upload binary
+  #       run: |
+  #         bundle exec fastlane upload_binary
