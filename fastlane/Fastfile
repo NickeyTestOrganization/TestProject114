@@ -1,0 +1,218 @@
+# encoding: utf-8
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+default_platform(:ios)
+
+platform :ios do
+	desc "Archive and Export ipa"
+	lane :ArchiveAndExport do |option|
+		# 设置Info.plist文件，解决在苹果后台提交版本时，需选择是否加密弹窗的问题。
+		set_info_plist_value(
+			path: ENV["INFO_PLIST_PATH"],
+			key: "ITSAppUsesNonExemptEncryption",
+			value: "false",
+		)
+
+		# 更新证书设置
+		update_code_signing_settings(
+			# 需要更新证书文件的target
+			targets: ENV["TARGET_1"],
+			# 签名身份
+			code_sign_identity: "iPhone Distribution",
+			# 配置文件的名字（不是文件名）
+			profile_name: ENV["PROFILE_NAME_" + option[:type] + "_1"],
+		)
+
+		gym(
+			# 打包之前是否先clean
+			clean: true,
+			# 输出ipa的路径
+			output_directory: ENV["OUTPUT_DIRECTORY"],
+			# 输出ipa的名字
+			output_name: ENV["IPA_OUTPUT_NAME"],
+			# 打包哪个scheme
+			scheme: ENV["SCHEME"],
+			# 打Release包还是Debug包
+			configuration: "Release",
+			# 是否使用了bitcode
+			include_bitcode: false,
+			# 是否导出dSYM文件
+			include_symbols: true,
+			# 导出方式，app-store ad-hoc development
+			export_method: option[:type],
+			# 设置打包生成的ExportOptions.plist中的值
+			export_options: {
+				iCloudContainerEnvironment: "Production",
+			},
+		)
+	end
+
+	desc "Upload binary"
+	lane :upload_binary do |option|
+		app_store_connect_api_key(
+			key_id: "NM53KKX9SU",
+			issuer_id: "1921709b-d3e9-44f5-8504-43f706aa9390",
+			key_filepath: "./fastlane/AuthKey_NM53KKX9SU.p8",
+			duration: 500, # optional (maximum 1200)
+			in_house: false, # optional but may be required if using match/sigh
+		)
+
+		deliver(
+			# app版本号，此版本号控制苹果后台需要发布的版本号
+			app_version: get_version_number(
+				target: ENV["TARGET_1"],
+			),
+			# 是否跳过上传metadata
+			skip_metadata: true,
+			# 是否跳过二进制文件上传
+			skip_binary_upload: false,
+			# 是否跳过屏幕截图上传
+			skip_screenshots: true,
+			# 需要提交ipa的路径
+			ipa: ENV["IPA_PATH"],
+			# 在上传所有内容后提交新版本进行审核，启用则会选择最后一个build的版本提交审核。
+			submit_for_review: ENV["SUBMIT_FOR_REVIEW"] == "true",
+			# 一旦应用程序审核通过，该应用会自动发布App Store
+			automatic_release: true,
+			# 启用或禁用 App Store Connect 的分阶段发布功能
+			phased_release: true,
+		)
+	end
+
+	desc "Upload to App Store and submit for review"
+	lane :upload_metadata do |option|
+		app_store_connect_api_key(
+			key_id: "NM53KKX9SU",
+			issuer_id: "1921709b-d3e9-44f5-8504-43f706aa9390",
+			key_filepath: "./fastlane/AuthKey_NM53KKX9SU.p8",
+			duration: 500, # optional (maximum 1200)
+			in_house: false, # optional but may be required if using match/sigh
+		)
+
+		version = option[:isNewVersion] == "" ? get_version_number(
+				target: ENV["TARGET_1"],
+			) : option[:isNewVersion]
+		puts version
+		
+		deliver(
+			# app版本号，此版本号控制苹果后台需要发布的版本号
+			app_version: version,
+			# 是否跳过上传metadata
+			skip_metadata: option[:upload_Screenshots],
+			# 是否跳过上传二进制文件
+			skip_binary_upload: true,
+			# 是否跳过屏幕截图上传
+			skip_screenshots: !option[:upload_Screenshots],
+		)
+	end
+
+	desc "Upload dSYM file to Firebase"
+	lane :upload_dSYM do
+		upload_symbols_to_crashlytics(
+			# dSYM路径
+			dsym_path: ENV["DSYM_PATH"],
+			# GoogleServic-Info.plist的路径
+			gsp_path: ENV["GSP_PATH"],
+		)
+	end
+
+	lane :firebase_distribution do |options|
+		firebase_app_distribution(
+			app: ENV["APP_ID"],
+			# ipa的路径
+			ipa_path: options[:isMasterTest] ? ENV["IPA_PATH_TEST"] : ENV["IPA_PATH"],
+			# 版本说明文件
+			release_notes_file: ENV["RELEASE_NOTE_FILE"],
+			# 您要邀请的测试人员群组
+			groups: "dev-team, product-team, production-team, qa-team",
+			# 您可以将其设置为 true 以显示详细的调试输出。
+			debug: true,
+		)
+		Actions.lane_context[SharedValues::FIREBASE_APP_DISTRO_RELEASE][:binaryDownloadUri]
+	end
+
+	lane :push_Podfile_lock do
+		git_add(
+			path: "Podfile.lock",
+		)
+		git_commit(
+			path: "Podfile.lock",
+			message: "提交Podfile.lock",
+		)
+		push_to_git_remote(
+			remote_branch: "master",
+		)
+	end
+
+	# 捕捉错误，发送到slack
+	error do |lane, exception|
+		timeStr = Time.now.getlocal("+08:00").strftime("%Y-%m-%d %H:%M:%S").to_s
+		slack(
+			message: "master分支打包失败\n*OOG101 - 7M Workout*\n<!subteam^S01K6B7A338> master分支打包失败，请检查提交，并重新推送\n*失败原因：* #{exception.message}\n*打包时间：* #{timeStr}\n",
+			slack_url: ENV["ERROR_SLACK_URL"],
+			success: false,
+			payload: {
+				"详细信息：" => exception.error_info.to_s,
+			},
+			attachment_properties: {
+				thumb_url: "https://tools.applemediaservices.com/api/artwork/US/app/806995720.png?locale=en-US",
+			},
+		)
+	end
+
+	desc "Send Slack Message"
+	lane :slack_message do |option|
+		slack(
+			message: option[:messageText],
+			success: !option[:isFailMessage],
+			default_payloads: [:last_git_commit],
+			slack_url: option[:isFailMessage] ? ENV["ERROR_SLACK_URL"] : ENV["SLACK_URL"],
+			attachment_properties: {
+				thumb_url: "https://tools.applemediaservices.com/api/artwork/US/app/806995720.png?locale=en-US",
+			},
+		)
+	end
+
+	desc "Send Submit Message"
+	lane :send_submit_message do
+		if ENV["SUBMIT_FOR_REVIEW"] != "true"
+			timeStr = Time.now.getlocal("+08:00").strftime("%Y-%m-%d %H:%M:%S").to_s
+		  submitStr = "<!here> *[OOG101] - [7M Workout]* 已于 *[#{timeStr}]* 成功上传至苹果商店，等待提交。"
+      slack(
+        slack_url: ENV["SLACK_SUBMIT_CHANNEL_URL"],
+        message: submitStr,
+        success: true,
+        default_payloads: [],
+        attachment_properties: {
+          thumb_url: "https://tools.applemediaservices.com/api/artwork/US/app/806995720.png?locale=en-US",
+        },
+      )
+		end
+	end
+
+	desc "Send Archive Finish Message"
+	lane :archive_finish_message do |option|
+		url = firebase_distribution(isMasterTest: true)
+		slack(
+			message: "#{option[:messageText]}<#{url}|下载安装包>，前往控制台:<https://console.firebase.google.com/project/test-project-33489/appdistribution/app/ios:com.oneothergame.7min-workout/releases|前往Firebase控制台>\n#{option[:personText]}",
+			success: true,
+			default_payloads: [:last_git_commit],
+			attachment_properties: {
+				thumb_url: "https://tools.applemediaservices.com/api/artwork/US/app/806995720.png?locale=en-US",
+			},
+		)
+	end
+end

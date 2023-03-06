@@ -1,0 +1,28 @@
+app_identifier("com.oneothergame.oog114")
+# 添加自动化打包需要的环境变量
+ENV["FASTLANE_USER"] = "80787656@qq.com"
+# 接收两步验证验证码的手机号
+ENV["SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER"] = "+86 1500 1190 627"
+# 两步验证专用密码
+ENV["FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD"] = "xomf-bgay-huiw-xrha"
+# 需要打包的scheme
+ENV["SCHEME"] = "oog114"
+# target1
+ENV["TARGET_1"] = "oog114"
+# 配置文件(app-store)1
+ENV["PROFILE_NAME_app-store_1"] = "OOG114 AppStore Test"
+# 导出的ipa存放的路径
+ENV["OUTPUT_DIRECTORY"] = "./fastlane/Release"
+# 导出ipa的名字
+ENV["IPA_OUTPUT_NAME"] = "OOG114.ipa"
+# 生成ipa的路径
+ENV["IPA_PATH"] = "./fastlane/Release/OOG114.ipa"
+# Info.plist路径
+ENV["INFO_PLIST_PATH"] = "./oog114/Info.plist"
+# 在上传所有内容后提交新版本进行审核，启用则会选择最后一个build的版本提交审核
+ENV["SUBMIT_FOR_REVIEW"] = "true"
+
+ENV["SLACK_URL"] = "https://hooks.slack.com/services/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"
+ENV["ERROR_SLACK_URL"] = "https://hooks.slack.com/services/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"
+ENV["SLACK_SUBMIT_CHANNEL_URL"] = "https://hooks.slack.com/services/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"
+ENV["FIREBASE_TOKEN"] = "1//0e7Pb-OJv4tiKCgYIARAAGA4SNwF-L9Irm3bTVJMOVL_6a1kUTII-syF6mGz5sCTC6lHgcU0LNdlyMv2QNZwKMllL5eIimHVN3mw"
