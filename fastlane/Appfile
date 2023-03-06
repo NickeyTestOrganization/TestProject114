@@ -22,7 +22,7 @@ ENV["INFO_PLIST_PATH"] = "./oog114/Info.plist"
 # 在上传所有内容后提交新版本进行审核，启用则会选择最后一个build的版本提交审核
 ENV["SUBMIT_FOR_REVIEW"] = "true"
 
-ENV["SLACK_URL"] = "https://hooks.slack.com/services/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"
-ENV["ERROR_SLACK_URL"] = "https://hooks.slack.com/services/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"
-ENV["SLACK_SUBMIT_CHANNEL_URL"] = "https://hooks.slack.com/services/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"
+ENV["SLACK_URL"] = "https://hooks.slack.com/services/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"
+ENV["ERROR_SLACK_URL"] = "https://hooks.slack.com/services/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"
+ENV["SLACK_SUBMIT_CHANNEL_URL"] = "https://hooks.slack.com/services/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"
 ENV["FIREBASE_TOKEN"] = "1//0e7Pb-OJv4tiKCgYIARAAGA4SNwF-L9Irm3bTVJMOVL_6a1kUTII-syF6mGz5sCTC6lHgcU0LNdlyMv2QNZwKMllL5eIimHVN3mw"
