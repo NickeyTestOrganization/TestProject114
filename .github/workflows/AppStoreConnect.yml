@@ -30,7 +30,7 @@ jobs:
       #   run: |
       #     bundle exec fastlane slack_message messageText:"自动化发布流程开始，开始上传Metadata\n*OOG101 - 7M Workout*\n<!subteam^S02KJ2JPCLE> <!subteam^S01K6B7A338> \n*推送程序员：* ${{ github.actor }}\n*打包时间：* $(TZ=$TZ-8 date +%Y年%m月%d日%H:%M:%S)\n"
       - name: Upload metadata
-        uses: ./.github/workflows/UploadMetadata.yml
+        uses: ./.github/workflows/UploadMetadata.yml@main
         with:
           upload_screenshots: false
         # run: |
