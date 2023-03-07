@@ -33,7 +33,7 @@ jobs:
   Test:
     runs-on: self-hosted
     steps:
-    - run: echo "${{ github }}"
+    - run: echo '${{ toJSON(github) }}'
   Prepare:
     if: github.event_name == 'workflow_dispatch'
     runs-on: self-hosted
