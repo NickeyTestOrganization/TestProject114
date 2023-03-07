@@ -9,18 +9,18 @@ on:
       isNewVersion:
         required: false
         type: string
-  workflow_dispatch:
-    inputs:
-      upload_screenshots:
-        description: "是否上传screenshots"
-        required: true
-        type: boolean
-        default: false
-      isNewVersion:
-        description: "是否是在新版本上传"
-        required: false
-        type: string
-        default: "false"
+        # workflow_dispatch:
+        #   inputs:
+        #     upload_screenshots:
+        #       description: "是否上传screenshots"
+        #       required: true
+        #       type: boolean
+        #       default: false
+        #     isNewVersion:
+        #       description: "是否是在新版本上传"
+        #       required: false
+        #       type: string
+        #       default: "false"
 
 # 使用并发
 # concurrency:
