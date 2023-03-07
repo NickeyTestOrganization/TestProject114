@@ -41,7 +41,7 @@ jobs:
     - name: Dump steps context
       run: echo '${{ toJSON(steps) }}'
   Prepare:
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event.workflow == '.github/workflows/UploadMetadata.yml'
     runs-on: self-hosted
     steps:
     - uses: actions/checkout@v3
@@ -50,6 +50,7 @@ jobs:
       run: |
         bundle install
   UploadMetadata:
+    needs: Prepare
     runs-on: self-hosted
     steps:
     - name: Slack upload metadata begin message
