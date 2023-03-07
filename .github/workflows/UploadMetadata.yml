@@ -33,7 +33,7 @@ jobs:
   Test:
     runs-on: self-hosted
     steps:
-    - run: echo "${{ github.event_name }}"
+    - run: echo "${{ github }}"
   Prepare:
     if: github.event_name == 'workflow_dispatch'
     runs-on: self-hosted
