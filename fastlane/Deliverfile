@@ -1,0 +1,43 @@
+# The Deliverfile allows you to store various App Store Connect metadata
+# For more information, check out the docs
+# https://docs.fastlane.tools/actions/deliver/
+
+# App价格级别。注意：这项提交当时就会生效，所以更改价格还是在后台手动操作
+price_tier 0
+# 启用或禁用 App Store Connect 的分阶段发布功能。
+# 通过自动更新的分阶段发布，您可以在 7 天内分阶段向已打开自动更新的用户发布此更新。
+# 请注意，所有用户仍可从 App Store 手动更新至此版本。您可最多暂停分阶段发布 30 天，或随时向所有用户发布此更新。
+phased_release(true)
+# 在上传所有内容后提交新版本进行审核，启用则会选择最后一个build的版本提交审核。
+submit_for_review(false)
+# 一旦应用程序审核通过，该应用会自动发布App Store
+automatic_release(true)
+# 跳过HTML报告文件验证（不理解，默认值为false）
+force(true)
+# 是否应该预先检查应用内购买？
+precheck_include_in_app_purchases(false)
+# 提交信息
+submission_information({
+  # 出口合规信息
+  # 使用加密
+  export_compliance_uses_encryption: false,
+  # 合规要求
+  export_compliance_compliance_required: false,
+  # 加密更新
+  export_compliance_encryption_updated: false,
+
+  # idfa
+  # 使用idfa
+  add_id_info_uses_idfa: true,
+  # 投放广告
+  add_id_info_serves_ads: true,
+  # 跟踪安装
+  add_id_info_tracks_install: true,
+  # 跟踪操作
+  add_id_info_tracks_action: true,
+  add_id_info_limits_tracking: true,
+
+  # 内容权利
+  # 包含第三方内容
+  content_rights_contains_third_party_content: false,
+})
