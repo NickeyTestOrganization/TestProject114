@@ -30,6 +30,10 @@ on:
 #   cancel-in-progress: true
 
 jobs:
+  Test:
+    runs-on: self-hosted
+    steps:
+    - run: echo "${{ github.event_name }}"
   Prepare:
     if: github.event_name == 'workflow_dispatch'
     runs-on: self-hosted
