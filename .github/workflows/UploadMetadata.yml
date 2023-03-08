@@ -23,11 +23,11 @@ on:
         default: "false"
 
 # 使用并发
-# concurrency:
-#   # 组名
-#   group: ${{ github.workflow }}-${{ github.ref }}
-#   # 是否取消当前正在进行的进程
-#   cancel-in-progress: true
+concurrency:
+  # 组名
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # 是否取消当前正在进行的进程
+  cancel-in-progress: true
 
 jobs:
   Prepare:
