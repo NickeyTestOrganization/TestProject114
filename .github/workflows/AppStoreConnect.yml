@@ -34,7 +34,7 @@ jobs:
 
   TestReusingFlow:
     needs: UploadMetadata
-    uses: NickeyTestOrganization/.github/workflow-templates/octo-organization-ci.yml@main
+    uses: NickeyTestOrganization/.github/workflows/octo-organization-ci.yml@main
 
   # InstallPods:
   #   needs: UploadMetadata
