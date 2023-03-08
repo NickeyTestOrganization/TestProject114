@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  Archive:
+  CheckoutAndBundleInstall:
     runs-on: self-hosted
 
     steps:
@@ -27,7 +27,7 @@ jobs:
         bundle install
 
   UploadMetadata:
-    needs: Archive
+    needs: CheckoutAndBundleInstall
     uses: NickeyTestOrganization/TestProject114/.github/workflows/UploadMetadata.yml@main
     with:
       upload_screenshots: false
