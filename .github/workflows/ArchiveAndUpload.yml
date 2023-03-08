@@ -33,6 +33,20 @@ jobs:
     - name: bundle install
       run: |
         bundle install
+
+    - name: Copy Podlock File
+      run: |
+        BACKUP_DIR=$(basename "$PWD")
+        BACKUP_DIR_PATH=${HOME}"/Documents/Backup/"
+        if [ -f ${BACKUP_DIR_PATH}${BACKUP_DIR}/"Podfile.lock" ]; then
+            echo "Podfile.lock exist!"
+            cp -f ${BACKUP_DIR_PATH}${BACKUP_DIR}/Podfile.lock ./Podfile.lock
+        fi
+    - name: Pod Install
+      run: |
+        # 重新拉取pod
+        pod install --repo-update
+
   ArchiveAndExport:
     if: ${{ always() }}
     needs: Prepare
