@@ -50,6 +50,7 @@ jobs:
       run: |
         bundle install
   UploadMetadata:
+    if: ${{ always() }}
     needs: Prepare
     runs-on: self-hosted
     steps:
