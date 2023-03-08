@@ -25,8 +25,8 @@ on:
 
 jobs:
   Prepare:
-    if: github.event.workflow == '.github/workflows/ArchiveAndUpload.yml'
-    runs-on: self-hosted
+    # if: github.event.workflow == '.github/workflows/ArchiveAndUpload.yml'
+    runs-on: [self-hosted, macOS, ARM64, nickey'smac]
     steps:
     - uses: actions/checkout@v3
 
@@ -41,9 +41,9 @@ jobs:
     - name: Archive&Export
       run: |
         bundle exec fastlane ArchiveAndExport type:${{ inputs.ChooseProvisionType }}
-    - name: Slack export finish message
-      run: |
-        bundle exec fastlane slack_message messageText:"发布包ipa文件已导出\n*OOG202 - Face Yoga*\n<!subteam^S02KJ2JPCLE> <!subteam^S01K6B7A338> 发布包ipa文件已导出，开始上传dSYM文件\n*推送程序员：* ${{ github.actor }}\n*打包时间：* $(TZ=$TZ-8 date +%Y年%m月%d日%H:%M:%S)\n"
+      # - name: Slack export finish message
+      #   run: |
+      #     bundle exec fastlane slack_message messageText:"发布包ipa文件已导出\n*OOG202 - Face Yoga*\n<!subteam^S02KJ2JPCLE> <!subteam^S01K6B7A338> 发布包ipa文件已导出，开始上传dSYM文件\n*推送程序员：* ${{ github.actor }}\n*打包时间：* $(TZ=$TZ-8 date +%Y年%m月%d日%H:%M:%S)\n"
 
   Upload_dSYMAndBackup:
     needs: ArchiveAndExport
@@ -53,9 +53,9 @@ jobs:
       run: |
         bundle exec fastlane upload_dSYM
 
-    - name: Slack upload dSYM finish message
-      run: |
-        bundle exec fastlane slack_message messageText:"发布包dSYM文件上传完成\n*OOG202 - Face Yoga*\n<!subteam^S02KJ2JPCLE> <!subteam^S01K6B7A338> 发布包dSYM文件上传完成，开始上传二进制文件\n*推送程序员：* ${{ github.actor }}\n*打包时间：* $(TZ=$TZ-8 date +%Y年%m月%d日%H:%M:%S)\n"
+    # - name: Slack upload dSYM finish message
+    #   run: |
+    #     bundle exec fastlane slack_message messageText:"发布包dSYM文件上传完成\n*OOG202 - Face Yoga*\n<!subteam^S02KJ2JPCLE> <!subteam^S01K6B7A338> 发布包dSYM文件上传完成，开始上传二进制文件\n*推送程序员：* ${{ github.actor }}\n*打包时间：* $(TZ=$TZ-8 date +%Y年%m月%d日%H:%M:%S)\n"
 
     - name: Backup ipa and dSYM
       run: |
