@@ -51,7 +51,6 @@ jobs:
     steps:
     - name: Upload dSYM to firebase
       run: |
-        # bundle exec fastlane upload_dSYM
         echo "上传dSYM"
 
     # - name: Slack upload dSYM finish message
