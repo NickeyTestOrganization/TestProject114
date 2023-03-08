@@ -33,7 +33,7 @@ jobs:
       upload_screenshots: false
 
   TestReusingFlow:
-    needs: upload_metadata
+    needs: UploadMetadata
     uses: NickeyTestOrganization/.github/workflow-templates/octo-organization-ci.yml@main
 
   # InstallPods:
