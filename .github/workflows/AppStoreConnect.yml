@@ -51,7 +51,7 @@ jobs:
         pod install --repo-update
 
   ArchiveAndExport:
-   needs: InstallPods
-   uses: NickeyTestOrganization/TestProject114/.github/workflows/ArchiveAndUpload.yml@main
+    needs: InstallPods
+    uses: NickeyTestOrganization/TestProject114/.github/workflows/ArchiveAndUpload.yml@main
     with:
-      ChooseProvisionType: "app-store" 
+      ChooseProvisionType: "app-store"
