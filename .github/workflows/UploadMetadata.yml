@@ -40,8 +40,8 @@ jobs:
       run: |
         bundle install
   UploadMetadata:
-    if: ${{ needs.Prepare.result  == 'success' || needs.Prepare.result == 'skipped' }}
-    # if: ${{ always() }}
+    # if: ${{ needs.Prepare.result  == 'success' || needs.Prepare.result == 'skipped' }}
+    if: ${{ success() }}
     needs: Prepare
     runs-on: self-hosted
     steps:
