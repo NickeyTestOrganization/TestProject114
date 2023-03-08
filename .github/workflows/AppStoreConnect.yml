@@ -32,68 +32,26 @@ jobs:
     with:
       upload_screenshots: false
 
-  TestReusingFlow:
+
+  InstallPods:
     needs: UploadMetadata
-    uses: NickeyTestOrganization/.github/workflow-templates/octo-organization-ci.yml@main
+    runs-on: self-hosted
+    steps:
+    - name: Copy Podlock File
+      run: |
+        BACKUP_DIR=$(basename "$PWD")
+        BACKUP_DIR_PATH=${HOME}"/Documents/Backup/"
+        if [ -f ${BACKUP_DIR_PATH}${BACKUP_DIR}/"Podfile.lock" ]; then
+            echo "Podfile.lock exist!"
+            cp -f ${BACKUP_DIR_PATH}${BACKUP_DIR}/Podfile.lock ./Podfile.lock
+        fi
+    - name: Pod Install
+      run: |
+        # 重新拉取pod
+        pod install --repo-update
 
-  # InstallPods:
-  #   needs: UploadMetadata
-  #   runs-on: self-hosted
-  #   steps:
-  #   - name: Copy Podlock File
-  #     run: |
-  #       BACKUP_DIR=$(basename "$PWD")
-  #       BACKUP_DIR_PATH=${HOME}"/Documents/Backup/"
-  #       if [ -f ${BACKUP_DIR_PATH}${BACKUP_DIR}/"Podfile.lock" ]; then
-  #           echo "Podfile.lock exist!"
-  #           cp -f ${BACKUP_DIR_PATH}${BACKUP_DIR}/Podfile.lock ./Podfile.lock
-  #       fi
-  #   - name: Pod Install
-  #     run: |
-  #       # 重新拉取pod
-  #       pod install --repo-update
-
-  # ArchiveAndExport:
-  #   needs: InstallPods
-  #   runs-on: self-hosted
-  #   steps:
-  #   - name: Archive&Export
-  #     run: |
-  #       bundle exec fastlane ArchiveAndExport type:"app-store"
-  #   - name: Slack export finish message
-  #     run: |
-  #       bundle exec fastlane slack_message messageText:"发布包ipa文件已导出\n*OOG202 - Face Yoga*\n<!subteam^S02KJ2JPCLE> <!subteam^S01K6B7A338> 发布包ipa文件已导出，开始上传dSYM文件\n*推送程序员：* ${{ github.actor }}\n*打包时间：* $(TZ=$TZ-8 date +%Y年%m月%d日%H:%M:%S)\n"
-
-  # Upload_dSYMAndBackup:
-  #   needs: ArchiveAndExport
-  #   runs-on: self-hosted
-  #   steps:
-  #   - name: Upload dSYM to firebase
-  #     run: |
-  #       bundle exec fastlane upload_dSYM
-
-  #   - name: Slack upload dSYM finish message
-  #     run: |
-  #       bundle exec fastlane slack_message messageText:"发布包dSYM文件上传完成\n*OOG202 - Face Yoga*\n<!subteam^S02KJ2JPCLE> <!subteam^S01K6B7A338> 发布包dSYM文件上传完成，开始上传二进制文件\n*推送程序员：* ${{ github.actor }}\n*打包时间：* $(TZ=$TZ-8 date +%Y年%m月%d日%H:%M:%S)\n"
-
-  #   - name: Backup ipa and dSYM
-  #     run: |
-  #       BACKUP_DIR=$(basename "$PWD")
-  #       BACKUP_DIR_PATH=${HOME}"/Documents/Backup/"
-  #       FASTLANE_RELEASE_DIR="./fastlane/Release/"
-
-  #       if [ ! -d "$BACKUP_DIR_PATH" ]; then
-  #           echo "未找到备份文件夹，创建备份文件夹"
-  #           mkdir ${BACKUP_DIR_PATH}
-  #       fi
-
-  #       if [ ! -d "${BACKUP_DIR_PATH}${BACKUP_DIR}" ]; then
-  #           echo "未找到备份子文件夹，创建备份子文件夹"
-  #           mkdir ${BACKUP_DIR_PATH}${BACKUP_DIR}
-  #       fi
-
-  #       cp ${FASTLANE_RELEASE_DIR}*.ipa ${BACKUP_DIR_PATH}${BACKUP_DIR}
-  #       cp ${FASTLANE_RELEASE_DIR}*.dSYM.zip ${BACKUP_DIR_PATH}${BACKUP_DIR}
-  #       echo "备份完成"
-
-
+  ArchiveAndExport:
+   needs: InstallPods
+   uses: NickeyTestOrganization/TestProject114/.github/workflows/ArchiveAndUpload.yml@main
+    with:
+      ChooseProvisionType: "app-store" 

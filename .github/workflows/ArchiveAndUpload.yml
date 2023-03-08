@@ -1,0 +1,51 @@
+name: Archive ipa & Upload dSYM
+
+on:
+  workflow_call:
+    inputs:
+      ChooseProvisionType:
+        description: "证书类型(ad-hoc/app-store/development)"
+        required: true
+        type: string
+        default: "ad-hoc"
+  workflow_dispatch:
+    inputs:
+      ChooseProvisionType:
+        description: "证书类型(ad-hoc/app-store/development)"
+        required: true
+        type: string
+        default: "ad-hoc"
+
+# 使用并发
+# concurrency:
+#   # 组名
+#   group: ${{ github.workflow }}-${{ github.ref }}
+#   # 是否取消当前正在进行的进程
+#   cancel-in-progress: true
+
+jobs:
+  Prepare:
+    if: github.event.workflow == '.github/workflows/UploadMetadata.yml'
+    runs-on: self-hosted
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: bundle install
+      run: |
+        bundle install
+  UploadMetadata:
+    if: ${{ always() }}
+    needs: Prepare
+    runs-on: self-hosted
+    steps:
+    # - name: Slack upload metadata begin message
+    #   run: |
+    #     bundle exec fastlane slack_message messageText:"开始上传Metadata\n*OOG111 - Home Workout*\n<!subteam^S02KJ2JPCLE> <!subteam^S01K6B7A338> 开始上传metadata\n*推送程序员：* ${{ github.actor }}\n*时间：* $(TZ=$TZ-8 date +%Y年%m月%d日%H:%M:%S)\n"
+
+    - name: Upload metadata
+      run: |
+        bundle exec fastlane upload_metadata kId:'${{ secrets.KEY_ID }}' issueId:'${{ secrets.ISSUE_ID }}' p8PrivateKey:'${{ secrets.P8_PRIVATE_KEY }}' upload_Screenshots:${{ inputs.upload_screenshots }} isNewVersion:${{ inputs.isNewVersion }}
+
+    # - name: Slack upload metadata finish message
+    #   run: |
+    #     bundle exec fastlane slack_message messageText:"上传Metadata完成\n*OOG111 - Home Workout*\n<!subteam^S02KJ2JPCLE> <!subteam^S01K6B7A338> 上传metadata完成\n*推送程序员：* ${{ github.actor }}\n*时间：* $(TZ=$TZ-8 date +%Y年%m月%d日%H:%M:%S)\n"
