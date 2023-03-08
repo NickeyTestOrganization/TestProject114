@@ -20,7 +20,7 @@ ENV["IPA_PATH"] = "./fastlane/Release/OOG114.ipa"
 # Info.plist路径
 ENV["INFO_PLIST_PATH"] = "./oog114/Info.plist"
 # 在上传所有内容后提交新版本进行审核，启用则会选择最后一个build的版本提交审核
-ENV["SUBMIT_FOR_REVIEW"] = "true"
+ENV["SUBMIT_FOR_REVIEW"] = "false"
 
 ENV["SLACK_URL"] = "https://hooks.slack.com/services/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"
 ENV["ERROR_SLACK_URL"] = "https://hooks.slack.com/services/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"
