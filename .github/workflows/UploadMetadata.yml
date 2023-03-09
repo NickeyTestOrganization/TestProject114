@@ -25,7 +25,7 @@ on:
 # 使用并发
 concurrency:
   # 组名
-  group: ${{ github.workflow }}-${{ github.ref }}-metadata
+  group: ${{ github.workflow }}-${{ github.ref }}
   # 是否取消当前正在进行的进程
   cancel-in-progress: true
 
@@ -40,6 +40,7 @@ jobs:
       run: |
         bundle install
   UploadMetadata:
+    # if: ${{ needs.Prepare.result  == 'success' || needs.Prepare.result == 'skipped' }}
     if: ${{ always() }}
     needs: Prepare
     runs-on: self-hosted
@@ -51,12 +52,9 @@ jobs:
       run: echo '${{ toJSON(needs) }}'
 
     - name: Upload metadata
-      if: ${{ needs.Prepare.result  == 'success' || needs.Prepare.result == 'skipped' }}
       run: |
         bundle exec fastlane upload_metadata kId:'${{ secrets.KEY_ID }}' issueId:'${{ secrets.ISSUE_ID }}' p8PrivateKey:'${{ secrets.P8_PRIVATE_KEY }}' upload_Screenshots:${{ inputs.upload_screenshots }} isNewVersion:${{ inputs.isNewVersion }}
 
-    - name: Dump needs context
-      run: echo '${{ toJSON(job) }}'
     # - name: Slack upload metadata finish message
     #   run: |
     #     bundle exec fastlane slack_message messageText:"上传Metadata完成\n*OOG111 - Home Workout*\n<!subteam^S02KJ2JPCLE> <!subteam^S01K6B7A338> 上传metadata完成\n*推送程序员：* ${{ github.actor }}\n*时间：* $(TZ=$TZ-8 date +%Y年%m月%d日%H:%M:%S)\n"
