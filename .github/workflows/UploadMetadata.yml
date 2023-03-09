@@ -33,12 +33,14 @@ jobs:
   Prepare:
     if: github.event.workflow == '.github/workflows/UploadMetadata.yml'
     runs-on: self-hosted
+
     steps:
     - uses: actions/checkout@v3
 
     - name: bundle install
       run: |
         bundle install
+
   UploadMetadata:
     # if: ${{ needs.Prepare.result  == 'success' || needs.Prepare.result == 'skipped' }}
     if: ${{ always() }}

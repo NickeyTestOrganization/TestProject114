@@ -32,7 +32,6 @@ jobs:
     with:
       upload_screenshots: false
 
-
   InstallPods:
     needs: UploadMetadata
     runs-on: self-hosted
@@ -45,6 +44,7 @@ jobs:
             echo "Podfile.lock exist!"
             cp -f ${BACKUP_DIR_PATH}${BACKUP_DIR}/Podfile.lock ./Podfile.lock
         fi
+
     - name: Pod Install
       run: |
         # 重新拉取pod
