@@ -51,6 +51,9 @@ jobs:
     - name: Dump job context
       run: echo '${{ toJSON(job) }}'
 
+    - name: Dump steps context
+      run: echo '${{ toJSON(steps) }}'
+
     - name: Upload metadata
       run: |
         bundle exec fastlane upload_metadata kId:'${{ secrets.KEY_ID }}' issueId:'${{ secrets.ISSUE_ID }}' p8PrivateKey:'${{ secrets.P8_PRIVATE_KEY }}' upload_Screenshots:${{ inputs.upload_screenshots }} isNewVersion:${{ inputs.isNewVersion }}
