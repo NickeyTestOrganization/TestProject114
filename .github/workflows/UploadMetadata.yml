@@ -23,11 +23,11 @@ on:
         default: "false"
 
 # 使用并发
-# concurrency:
-#   # 组名
-#   group: ${{ github.workflow }}-${{ github.ref }}-metadata
-#   # 是否取消当前正在进行的进程
-#   cancel-in-progress: true
+concurrency:
+  # 组名
+  group: ${{ github.workflow }}-${{ github.ref }}-metadata
+  # 是否取消当前正在进行的进程
+  cancel-in-progress: true
 
 jobs:
   Prepare:
@@ -50,9 +50,6 @@ jobs:
     #     bundle exec fastlane slack_message messageText:"开始上传Metadata\n*OOG111 - Home Workout*\n<!subteam^S02KJ2JPCLE> <!subteam^S01K6B7A338> 开始上传metadata\n*推送程序员：* ${{ github.actor }}\n*时间：* $(TZ=$TZ-8 date +%Y年%m月%d日%H:%M:%S)\n"
     - name: Dump job context
       run: echo '${{ toJSON(job) }}'
-
-    - name: Dump steps context
-      run: echo '${{ toJSON(steps) }}'
 
     - name: Upload metadata
       run: |
