@@ -33,61 +33,61 @@ jobs:
       upload_screenshots: false
 
 
-  InstallPods:
-    needs: UploadMetadata
-    runs-on: self-hosted
-    steps:
-    - name: Copy Podlock File
-      run: |
-        BACKUP_DIR=$(basename "$PWD")
-        BACKUP_DIR_PATH=${HOME}"/Documents/Backup/"
-        if [ -f ${BACKUP_DIR_PATH}${BACKUP_DIR}/"Podfile.lock" ]; then
-            echo "Podfile.lock exist!"
-            cp -f ${BACKUP_DIR_PATH}${BACKUP_DIR}/Podfile.lock ./Podfile.lock
-        fi
-    - name: Pod Install
-      run: |
-        # 重新拉取pod
-        pod install --repo-update
+  # InstallPods:
+  #   needs: UploadMetadata
+  #   runs-on: self-hosted
+  #   steps:
+  #   - name: Copy Podlock File
+  #     run: |
+  #       BACKUP_DIR=$(basename "$PWD")
+  #       BACKUP_DIR_PATH=${HOME}"/Documents/Backup/"
+  #       if [ -f ${BACKUP_DIR_PATH}${BACKUP_DIR}/"Podfile.lock" ]; then
+  #           echo "Podfile.lock exist!"
+  #           cp -f ${BACKUP_DIR_PATH}${BACKUP_DIR}/Podfile.lock ./Podfile.lock
+  #       fi
+  #   - name: Pod Install
+  #     run: |
+  #       # 重新拉取pod
+  #       pod install --repo-update
 
-  ArchiveAndExport:
-    needs: InstallPods
-    uses: NickeyTestOrganization/TestProject114/.github/workflows/ArchiveAndUpload.yml@main
-    with:
-      ChooseProvisionType: "app-store"
+  # ArchiveAndExport:
+  #   needs: InstallPods
+  #   uses: NickeyTestOrganization/TestProject114/.github/workflows/ArchiveAndUpload.yml@main
+  #   with:
+  #     ChooseProvisionType: "app-store"
 
-  UploadBinary:
-    needs: ArchiveAndExport
-    runs-on: self-hosted
-    steps:
-    - name: Upload Binary
-      run: |
-        bundle exec fastlane upload_binary kId:'' issueId:'' p8PrivateKey:''
+  # UploadBinary:
+  #   needs: ArchiveAndExport
+  #   runs-on: self-hosted
+  #   steps:
+  #   - name: Upload Binary
+  #     run: |
+  #       bundle exec fastlane upload_binary kId:'' issueId:'' p8PrivateKey:''
 
-  SendSubmitMessage:
-    needs: UploadBinary
-    runs-on: self-hosted
-    steps:
-    - name: Slack submit message
-      run: |
-        # bundle exec fastlane send_submit_message
-        echo "bundle exec fastlane send_submit_message"
+  # SendSubmitMessage:
+  #   needs: UploadBinary
+  #   runs-on: self-hosted
+  #   steps:
+  #   - name: Slack submit message
+  #     run: |
+  #       # bundle exec fastlane send_submit_message
+  #       echo "bundle exec fastlane send_submit_message"
 
-  PushPodlock:
-    needs: SendSubmitMessage
-    runs-on: self-hosted
-    steps:
-    - name: Push Podfile.lock to Github
-      run: |
-        # 检查仓库状态并写入Status.txt
-        git status -s >>Status.txt
-        # 判断Podfile.lock有无修改
-        if [ $(grep -c "Podfile.lock" Status.txt) != 0 ]; then
-          echo "检测到Podfile.lock有变动，执行上传操作"
-          # 提交Podfile.lock文件
-          bundle exec fastlane push_Podfile_lock
-        else
-          echo "未检测到Podfile.lock有变动，结束"
-        fi
-        # 将Status.txt文件删除
-        rm -f Status.txt
+  # PushPodlock:
+  #   needs: SendSubmitMessage
+  #   runs-on: self-hosted
+  #   steps:
+  #   - name: Push Podfile.lock to Github
+  #     run: |
+  #       # 检查仓库状态并写入Status.txt
+  #       git status -s >>Status.txt
+  #       # 判断Podfile.lock有无修改
+  #       if [ $(grep -c "Podfile.lock" Status.txt) != 0 ]; then
+  #         echo "检测到Podfile.lock有变动，执行上传操作"
+  #         # 提交Podfile.lock文件
+  #         bundle exec fastlane push_Podfile_lock
+  #       else
+  #         echo "未检测到Podfile.lock有变动，结束"
+  #       fi
+  #       # 将Status.txt文件删除
+  #       rm -f Status.txt

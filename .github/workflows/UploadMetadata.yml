@@ -48,6 +48,8 @@ jobs:
     # - name: Slack upload metadata begin message
     #   run: |
     #     bundle exec fastlane slack_message messageText:"开始上传Metadata\n*OOG111 - Home Workout*\n<!subteam^S02KJ2JPCLE> <!subteam^S01K6B7A338> 开始上传metadata\n*推送程序员：* ${{ github.actor }}\n*时间：* $(TZ=$TZ-8 date +%Y年%m月%d日%H:%M:%S)\n"
+    - name: Dump job context
+      run: echo '${{ toJSON(job) }}'
 
     - name: Upload metadata
       run: |
