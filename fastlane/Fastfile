@@ -215,4 +215,20 @@ platform :ios do
       },
     )
   end
+
+  desc "Send Test Message"
+  lane :send_message do
+    timeStr = Time.now.getlocal("+08:00").strftime("%Y-%m-%d %H:%M:%S").to_s
+    submitStr = "<!here> *[OOG101] - [7M Workout]* 已于 *[#{timeStr}]* 成功上传至苹果商店，等待提交。"
+    slack(
+      # slack_url: ENV["SLACK_SUBMIT_CHANNEL_URL"],
+      channel: "#测试",
+      message: submitStr,
+      success: true,
+      default_payloads: [],
+      attachment_properties: {
+        thumb_url: "https://tools.applemediaservices.com/api/artwork/US/app/806995720.png?locale=en-US",
+      },
+    )
+  end
 end
